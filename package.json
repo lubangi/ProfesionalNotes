@@ -1,17 +1,23 @@
 {
-  "name": "notes",
-  "version": "1.0.0",
+  "name": "notes-api-2",
+  "version": "1.0.2",
   "description": "Notes Application",
   "main": "index.js",
   "scripts": {
     "start": " node server",
-    "dev" : "nodemon server"
+    "dev": "nodemon server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookie": "^0.5.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "D": "^1.0.0",
+    "date-fns": "^2.29.3",
     "express": "^4.18.2",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "parser": "^0.1.4",
+    "uuid": "^9.0.0"
   }
 }

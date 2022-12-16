@@ -2,8 +2,19 @@ const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 3500
 const path = require ('path')
- 
-app.use('/',express.static(path.join(__dirname,'public')))
+const { logger } = require('./middleware/logger')
+const errorHandler = require('./middleware/errorHandler')
+const cookieParser = require('cookie-parser')
+const cors = require ('cors')
+const corsOptions = require ('./config/corsOptions')
+
+//middleware
+app.use(logger)
+app.use(cors(corsOptions))
+app.use (express.json())
+app.use(cookieParser)
+
+app.use(express.static('public'))
 app.use('/',require( './routes/Root'))
 app.all('*',(req, res)=>{
     res.status(400)
@@ -18,6 +29,9 @@ app.all('*',(req, res)=>{
     }
 })
 
+app.use(errorHandler)
+
+//listenning
 app.listen(PORT,()=>{
     console.log('server is listening on port :'+ PORT)
 })
