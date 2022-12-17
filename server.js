@@ -1,38 +1,51 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
-const PORT = process.env.PORT || 3500
-const path = require ('path')
-const { logger } = require('./middleware/logger')
+const path = require('path')
+const { logger, logEvents } = require('./middleware/logger')
 const errorHandler = require('./middleware/errorHandler')
 const cookieParser = require('cookie-parser')
-const cors = require ('cors')
-const corsOptions = require ('./config/corsOptions')
+const cors = require('cors')
+const corsOptions = require('./config/corsOptions')
+const connectDB = require('./config/dbConn')
+const mongoose = require('mongoose')
+const PORT = process.env.PORT || 3500
 
-//middleware
+console.log(process.env.NODE_ENV)
+
+connectDB()
+
 app.use(logger)
-app.use(cors(corsOptions))
-app.use (express.json())
-app.use(cookieParser)
 
-app.use(express.static('public'))
-app.use('/',require( './routes/Root'))
-app.all('*',(req, res)=>{
-    res.status(400)
-    if (req.accepts('html')){
-        res.sendFile(path.join(__dirname,'Views','404.html'))
-        
-    } else if (req.accepts('json')){
-        res.send({message:" 404 Not found"})
-        
+app.use(cors(corsOptions))
+
+app.use(express.json())
+
+app.use(cookieParser())
+
+app.use('/', express.static(path.join(__dirname, 'public')))
+
+app.use('/', require('./routes/root'))
+
+app.all('*', (req, res) => {
+    res.status(404)
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'views', '404.html'))
+    } else if (req.accepts('json')) {
+        res.json({ message: '404 Not Found' })
     } else {
-        res.type('text').send('404 not Found')
+        res.type('txt').send('404 Not Found')
     }
 })
 
 app.use(errorHandler)
 
-//listenning
-app.listen(PORT,()=>{
-    console.log('server is listening on port :'+ PORT)
+mongoose.connection.once('open', () => {
+    console.log('Connected to MongoDB')
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 })
 
+mongoose.connection.on('error', err => {
+    console.log(err)
+    logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log')
+})
