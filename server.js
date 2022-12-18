@@ -25,7 +25,14 @@ app.use(cookieParser())
 
 app.use('/', express.static(path.join(__dirname, 'public')))
 
+// route for all 
 app.use('/', require('./routes/root'))
+
+// route for users
+//users= endpoint
+//userRoutes= routes located in route for users, filename= userRoutes
+app.use('/users', require('./routes/userRoutes'))
+
 
 app.all('*', (req, res) => {
     res.status(404)
